@@ -5,6 +5,10 @@ import { Modal } from './common/Modal';
 import { useToast } from './common/Toast';
 import styles from './StrategyForm.module.css';
 
+const SEMESTER_OPTIONS = ['高一上', '高一下', '高二上', '高二下', '高三上', '高三下'];
+
+const UNIT_OPTIONS = Array.from({ length: 16 }, (_, i) => `Unidad ${i + 1}`);
+
 interface StrategyFormProps {
   strategy?: GenerationStrategy | null;
   onSubmit: (data: StrategyCreate | StrategyUpdate) => Promise<boolean>;
@@ -17,8 +21,13 @@ export function StrategyForm({ strategy, onSubmit, onClose }: StrategyFormProps)
   const [difficultyMedium, setDifficultyMedium] = useState(strategy?.difficulty_medium || 50);
   const [difficultyHard, setDifficultyHard] = useState(strategy?.difficulty_hard || 20);
   const [unitRatios, setUnitRatios] = useState<Record<string, string>>(transformUnitRatios(strategy?.unit_ratios));
+  const [newSemester, setNewSemester] = useState('');
   const [newUnit, setNewUnit] = useState('');
   const [newRatio, setNewRatio] = useState('');
+  const [newSemesterCustomMode, setNewSemesterCustomMode] = useState(false);
+  const [newUnitCustomMode, setNewUnitCustomMode] = useState(false);
+  const [newSemesterCustom, setNewSemesterCustom] = useState('');
+  const [newUnitCustom, setNewUnitCustom] = useState('');
   const { showToast } = useToast();
 
   const isEditing = !!strategy;
@@ -40,10 +49,36 @@ export function StrategyForm({ strategy, onSubmit, onClose }: StrategyFormProps)
   };
 
   const handleAddUnit = () => {
-    if (!newUnit.trim() || !newRatio.trim()) return;
-    setUnitRatios(prev => ({ ...prev, [newUnit.trim()]: newRatio.trim() }));
+    const sem = newSemesterCustomMode ? newSemesterCustom.trim() : newSemester.trim();
+    const uni = newUnitCustomMode ? newUnitCustom.trim() : newUnit.trim();
+
+    if (!sem && !uni) {
+      showToast('请选择或输入学期和单元', 'warning');
+      return;
+    }
+    if (!uni) {
+      showToast('请选择或输入单元', 'warning');
+      return;
+    }
+    if (!newRatio.trim()) {
+      showToast('请输入比例', 'warning');
+      return;
+    }
+
+    const unitKey = sem && uni ? `${sem}-${uni}` : (sem || uni);
+
+    setUnitRatios(prev => ({ ...prev, [unitKey]: newRatio.trim() }));
+    resetNewUnitInputs();
+  };
+
+  const resetNewUnitInputs = () => {
+    setNewSemester('');
     setNewUnit('');
     setNewRatio('');
+    setNewSemesterCustomMode(false);
+    setNewUnitCustomMode(false);
+    setNewSemesterCustom('');
+    setNewUnitCustom('');
   };
 
   const handleRemoveUnit = (unit: string) => {
@@ -181,13 +216,70 @@ export function StrategyForm({ strategy, onSubmit, onClose }: StrategyFormProps)
             ))}
           </div>
           <div className={styles.addUnitRow}>
-            <input
-              type="text"
-              className={styles.input}
-              placeholder="单元名称"
-              value={newUnit}
-              onChange={(e) => setNewUnit(e.target.value)}
-            />
+            <div className={styles.unitInputGroup}>
+              <select
+                className={styles.select}
+                value={newSemesterCustomMode ? '__custom__' : newSemester}
+                onChange={(e) => {
+                  if (e.target.value === '__custom__') {
+                    setNewSemesterCustomMode(true);
+                    setNewSemester('');
+                  } else {
+                    setNewSemesterCustomMode(false);
+                    setNewSemesterCustom('');
+                    setNewSemester(e.target.value);
+                  }
+                }}
+              >
+                <option value="">学期</option>
+                {SEMESTER_OPTIONS.map(opt => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+                <option value="__custom__">✏️ 自定义</option>
+              </select>
+              {newSemesterCustomMode && (
+                <input
+                  type="text"
+                  className={styles.customInput}
+                  placeholder="自定义学期"
+                  value={newSemesterCustom}
+                  onChange={(e) => setNewSemesterCustom(e.target.value)}
+                />
+              )}
+            </div>
+
+            <div className={styles.unitInputGroup}>
+              <select
+                className={styles.select}
+                value={newUnitCustomMode ? '__custom__' : newUnit}
+                onChange={(e) => {
+                  if (e.target.value === '__custom__') {
+                    setNewUnitCustomMode(true);
+                    setNewUnit('');
+                  } else {
+                    setNewUnitCustomMode(false);
+                    setNewUnitCustom('');
+                    setNewUnit(e.target.value);
+                  }
+                }}
+              >
+                <option value="">单元</option>
+                {UNIT_OPTIONS.map(opt => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+                <option value="__custom__">✏️ 自定义</option>
+              </select>
+              {newUnitCustomMode && (
+                <input
+                  type="text"
+                  className={styles.customInput}
+                  placeholder="自定义单元"
+                  value={newUnitCustom}
+                  onChange={(e) => setNewUnitCustom(e.target.value)}
+                />
+              )}
+            </div>
+
             <input
               type="number"
               className={styles.input}

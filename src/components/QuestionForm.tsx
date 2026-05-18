@@ -11,6 +11,29 @@ interface QuestionFormProps {
   onClose: () => void;
 }
 
+const SEMESTER_OPTIONS = ['高一上', '高一下', '高二上', '高二下', '高三上', '高三下'];
+
+const UNIT_OPTIONS = Array.from({ length: 16 }, (_, i) => `Unidad ${i + 1}`);
+
+function parseUnit(unitStr: string): [string, string] {
+  if (!unitStr) return ['', ''];
+  const parts = unitStr.split('-');
+  if (parts.length >= 2) {
+    return [parts[0], parts.slice(1).join('-')];
+  }
+  if (SEMESTER_OPTIONS.includes(parts[0])) {
+    return [parts[0], ''];
+  }
+  return ['', unitStr];
+}
+
+function buildUnit(semester: string, unit: string): string {
+  if (semester && unit) return `${semester}-${unit}`;
+  if (semester) return semester;
+  if (unit) return unit;
+  return '';
+}
+
 const initialFormData: QuestionCreate = {
   type: 'single',
   content: '',
@@ -22,18 +45,25 @@ const initialFormData: QuestionCreate = {
   blanks: [{ content: '', answer: '' }],
   exam_points: [],
   difficulty: 'easy',
-  unit: 'Unit 1'
+  unit: ''
 };
 
 export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps) {
   const [formData, setFormData] = useState<QuestionCreate>(initialFormData);
   const [examPointsInput, setExamPointsInput] = useState('');
+  const [semester, setSemester] = useState('');
+  const [unit, setUnit] = useState('');
+  const [semesterCustomMode, setSemesterCustomMode] = useState(false);
+  const [unitCustomMode, setUnitCustomMode] = useState(false);
+  const [semesterCustomValue, setSemesterCustomValue] = useState('');
+  const [unitCustomValue, setUnitCustomValue] = useState('');
   const { showToast } = useToast();
 
   const isEditing = !!question;
 
   useEffect(() => {
     if (question) {
+      const [sem, uni] = parseUnit(question.unit || '');
       setFormData({
         type: question.type,
         content: question.content || '',
@@ -45,12 +75,24 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
         blanks: question.blanks || [{ content: '', answer: '' }],
         exam_points: question.exam_points || [],
         difficulty: question.difficulty || 'easy',
-        unit: question.unit || 'Unit 1'
+        unit: question.unit || ''
       });
       setExamPointsInput(question.exam_points?.join(', ') || '');
+      setSemester(sem);
+      setUnit(uni);
+      setSemesterCustomMode(false);
+      setUnitCustomMode(false);
+      setSemesterCustomValue('');
+      setUnitCustomValue('');
     } else {
       setFormData(initialFormData);
       setExamPointsInput('');
+      setSemester('');
+      setUnit('');
+      setSemesterCustomMode(false);
+      setUnitCustomMode(false);
+      setSemesterCustomValue('');
+      setUnitCustomValue('');
     }
   }, [question]);
 
@@ -161,8 +203,66 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
     setFormData(prev => ({ ...prev, difficulty }));
   };
 
-  const handleUnitChange = (unit: string) => {
-    setFormData(prev => ({ ...prev, unit }));
+  const handleSemesterSelect = (value: string) => {
+    if (value === '__custom__') {
+      setSemesterCustomMode(true);
+      setSemester('');
+    } else {
+      setSemester(value);
+      setSemesterCustomMode(false);
+      setSemesterCustomValue('');
+      updateFormUnit();
+    }
+  };
+
+  const handleUnitSelect = (value: string) => {
+    if (value === '__custom__') {
+      setUnitCustomMode(true);
+      setUnit('');
+    } else {
+      setUnit(value);
+      setUnitCustomMode(false);
+      setUnitCustomValue('');
+      updateFormUnit();
+    }
+  };
+
+  const handleSemesterCustomChange = (value: string) => {
+    setSemesterCustomValue(value);
+    setSemester(value);
+    updateFormUnit();
+  };
+
+  const handleUnitCustomChange = (value: string) => {
+    setUnitCustomValue(value);
+    setUnit(value);
+    updateFormUnit();
+  };
+
+  const resetSemesterToSelect = () => {
+    setSemesterCustomMode(false);
+    setSemesterCustomValue('');
+    setSemester('');
+    updateFormUnit();
+  };
+
+  const resetUnitToSelect = () => {
+    setUnitCustomMode(false);
+    setUnitCustomValue('');
+    setUnit('');
+    updateFormUnit();
+  };
+
+  const updateFormUnit = () => {
+    const sem = semesterCustomMode ? semesterCustomValue : semester;
+    const uni = unitCustomMode ? unitCustomValue : unit;
+    setFormData(prev => ({ ...prev, unit: buildUnit(sem, uni) }));
+  };
+
+  const getUnitPreview = () => {
+    const sem = semesterCustomMode ? semesterCustomValue : semester;
+    const uni = unitCustomMode ? unitCustomValue : unit;
+    return buildUnit(sem, uni) || '未选择';
   };
 
   const validateForm = (): boolean => {
@@ -710,15 +810,87 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
           </select>
         </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>单元标记</label>
-          <input
-            type="text"
-            className={styles.input}
-            placeholder="例如：Unit 1"
-            value={formData.unit || ''}
-            onChange={(e) => handleUnitChange(e.target.value)}
-          />
+        <div className={styles.formRow}>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              学期 <span className={styles.labelHint}>或自定义</span>
+            </label>
+            {!semesterCustomMode ? (
+              <div className={styles.selectWithReset}>
+                <select
+                  className={styles.select}
+                  value={semester}
+                  onChange={(e) => handleSemesterSelect(e.target.value)}
+                >
+                  <option value="">请选择学期</option>
+                  {SEMESTER_OPTIONS.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                  <option value="__custom__">✏️ 自定义...</option>
+                </select>
+              </div>
+            ) : (
+              <div className={styles.inputWithReset}>
+                <input
+                  type="text"
+                  className={styles.input}
+                  placeholder="输入自定义学期，如：2024秋"
+                  value={semesterCustomValue}
+                  onChange={(e) => handleSemesterCustomChange(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className={styles.resetBtn}
+                  onClick={resetSemesterToSelect}
+                >
+                  ↩ 恢复选择
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              单元 <span className={styles.labelHint}>或自定义</span>
+            </label>
+            {!unitCustomMode ? (
+              <div className={styles.selectWithReset}>
+                <select
+                  className={styles.select}
+                  value={unit}
+                  onChange={(e) => handleUnitSelect(e.target.value)}
+                >
+                  <option value="">请选择单元</option>
+                  {UNIT_OPTIONS.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                  <option value="__custom__">✏️ 自定义...</option>
+                </select>
+              </div>
+            ) : (
+              <div className={styles.inputWithReset}>
+                <input
+                  type="text"
+                  className={styles.input}
+                  placeholder="输入自定义单元，如：期中复习"
+                  value={unitCustomValue}
+                  onChange={(e) => handleUnitCustomChange(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className={styles.resetBtn}
+                  onClick={resetUnitToSelect}
+                >
+                  ↩ 恢复选择
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.unitPreview}>
+          <span className={styles.previewLabel}>单元标记：</span>
+          <span>{getUnitPreview()}</span>
         </div>
 
         <div className={styles.formGroup}>
