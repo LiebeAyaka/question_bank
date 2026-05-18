@@ -62,8 +62,9 @@ def run_migrations(db_path: str):
                 continue
 
             try:
-                # 特殊处理迁移 003：检查列是否存在
-                if version == 3:
+                if version == 2:
+                    _apply_migration_002(cursor, sql, version, filename)
+                elif version == 3:
                     _apply_migration_003(cursor, sql, version, filename)
                 else:
                     cursor.executescript(sql)
@@ -86,6 +87,52 @@ def run_migrations(db_path: str):
             logger.info(f'Applied {applied_count} migration(s)')
     finally:
         conn.close()
+
+
+_UNESCAPE_REPLACES = [
+    ('&amp;', '&'), ('&lt;', '<'), ('&gt;', '>'),
+    ('&quot;', '"'), ('&#39;', "'"),
+]
+
+def _unescape_value(value: str) -> str:
+    for entity, char in _UNESCAPE_REPLACES:
+        value = value.replace(entity, char)
+    return value
+
+def _apply_migration_002(cursor, sql: str, version: int, filename: str):
+    cursor.execute("PRAGMA table_info(questions)")
+    columns = {row[1] for row in cursor.fetchall()}
+
+    text_columns = ['content', 'answer', 'questions', 'blanks']
+    for col in text_columns:
+        if col in columns:
+            like_clauses = ' OR '.join(
+                [f"{col} LIKE '%{entity}%'" for entity, _ in _UNESCAPE_REPLACES]
+            )
+            cursor.execute(
+                f"SELECT rowid, {col} FROM questions WHERE {like_clauses}"
+            )
+            for rowid, val in cursor.fetchall():
+                new_val = _unescape_value(val)
+                cursor.execute(
+                    f"UPDATE questions SET {col} = ? WHERE rowid = ?",
+                    (new_val, rowid)
+                )
+
+    tags_col = 'tags' if 'tags' in columns else ('exam_points' if 'exam_points' in columns else None)
+    if tags_col:
+        like_clauses = ' OR '.join(
+            [f"{tags_col} LIKE '%{entity}%'" for entity, _ in _UNESCAPE_REPLACES]
+        )
+        cursor.execute(
+            f"SELECT rowid, {tags_col} FROM questions WHERE {like_clauses}"
+        )
+        for rowid, val in cursor.fetchall():
+            new_val = _unescape_value(val)
+            cursor.execute(
+                f"UPDATE questions SET {tags_col} = ? WHERE rowid = ?",
+                (new_val, rowid)
+            )
 
 
 def _apply_migration_003(cursor, sql: str, version: int, filename: str):
