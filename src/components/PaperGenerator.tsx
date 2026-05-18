@@ -16,7 +16,9 @@ export function PaperGenerator() {
     paperTitle, setPaperTitle,
     sections, addSection, removeSection, updateSection,
     generatedQuestions, generatePaper,
-    showAnswer, setShowAnswer, resetPaper
+    showAnswer, setShowAnswer, resetPaper,
+    resetNumber, setResetNumber,
+    selectedStrategyId, setSelectedStrategyId
   } = usePaperStore();
   const { showToast } = useToast();
 
@@ -27,8 +29,8 @@ export function PaperGenerator() {
 
   const { createStrategy, updateStrategy, deleteStrategy } = useStrategyStore();
 
-  const handleCreateStrategy = async (data: StrategyCreate) => {
-    const result = await createStrategy(data);
+  const handleCreateStrategy = async (data: StrategyCreate | StrategyUpdate) => {
+    const result = await createStrategy(data as StrategyCreate);
     return !!result;
   };
 
@@ -462,17 +464,6 @@ export function PaperGenerator() {
             )}
           </div>
         )}
-      </div>
-
-      <div className={styles.inputGroup}>
-        <label className={styles.checkboxGroup}>
-          <input
-            type="checkbox"
-            checked={resetNumber}
-            onChange={(e) => setResetNumber(e.target.checked)}
-          />
-          题号独立（每大题从1开始）
-        </label>
       </div>
 
       <div className={styles.inputGroup}>

@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import type { Question, PaperSection } from '@/types/question';
 import { TYPE_NAMES } from '@/types/question';
 import { shuffle } from '@/utils/shuffle';
-import type { GenerationStrategy } from '@/types/strategy';
 import { useStrategyStore } from './strategyStore';
 
 interface PaperState {
@@ -13,7 +12,6 @@ interface PaperState {
   warnings: string[];
   resetNumber: boolean;
   selectedStrategyId: string | null;
-  resetNumber: boolean;
 
   setPaperTitle: (title: string) => void;
   addSection: () => void;
@@ -21,6 +19,8 @@ interface PaperState {
   updateSection: (index: number, section: Partial<PaperSection>) => void;
   generatePaper: (allQuestions: Question[]) => string[];
   setShowAnswer: (show: boolean) => void;
+  setResetNumber: (reset: boolean) => void;
+  setSelectedStrategyId: (id: string | null) => void;
   resetPaper: () => void;
 }
 
@@ -30,6 +30,8 @@ export const usePaperStore = create<PaperState>((set, get) => ({
   generatedQuestions: [],
   showAnswer: false,
   warnings: [],
+  resetNumber: false,
+  selectedStrategyId: null,
 
   setPaperTitle: (title) => set({ paperTitle: title }),
 
