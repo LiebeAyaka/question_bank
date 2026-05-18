@@ -56,17 +56,57 @@ def safe_json_loads(value):
         return None
 
 
+VALID_TYPES = {'single', 'judge', 'reading', 'cloze', 'task_reading', 'fill', 'short_answer', 'essay', 'listening_single', 'listening_group'}
+
+TYPE_ALIASES = {
+    'listening': 'listening_group',
+}
+
+
+def _normalize_items(items, defaults, str_field='content'):
+    if not items or not isinstance(items, list):
+        return items
+    result = []
+    for item in items:
+        if isinstance(item, dict):
+            normalized = dict(defaults)
+            normalized.update(item)
+            result.append(normalized)
+        elif isinstance(item, str):
+            normalized = dict(defaults)
+            normalized[str_field] = item
+            result.append(normalized)
+        else:
+            result.append(dict(defaults))
+    return result
+
+
 def question_from_row(row: dict) -> dict:
+    raw_questions = safe_json_loads(row.get('questions'))
+    raw_blanks = safe_json_loads(row.get('blanks'))
+    raw_options = safe_json_loads(row.get('options'))
+
+    normalized_questions = _normalize_items(raw_questions, {'content': '', 'answer': ''}, str_field='content')
+    normalized_blanks = _normalize_items(raw_blanks, {'answer': ''}, str_field='answer')
+
+    if raw_options and isinstance(raw_options, list):
+        normalized_options = [str(o) if o is not None else '' for o in raw_options]
+    else:
+        normalized_options = raw_options
+
+    q_type = row['type']
+    q_type = TYPE_ALIASES.get(q_type, q_type)
+
     question = QuestionBase(
         id=row['id'],
-        type=row['type'],
+        type=q_type,
         content=row['content'],
         title=row.get('title'),
         sub_type=row.get('sub_type'),
-        options=safe_json_loads(row.get('options')),
+        options=normalized_options,
         answer=row.get('answer'),
-        questions=safe_json_loads(row.get('questions')),
-        blanks=safe_json_loads(row.get('blanks')),
+        questions=normalized_questions,
+        blanks=normalized_blanks,
         exam_points=safe_json_loads(row.get('exam_points')),
         difficulty=row.get('difficulty'),
         unit=row.get('unit'),

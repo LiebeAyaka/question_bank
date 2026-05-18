@@ -6,9 +6,16 @@ questions.json
 
 # 本地计划文档
 plan.md
-
-# 文档目录
 docs/
+
+# 测试
+.pytest_cache/
+.superpowers/
+.trae/
+.uploads/
+dogfood-output/
+server/tests/
+
 
 # 依赖目录
 node_modules/
