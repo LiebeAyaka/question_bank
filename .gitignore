@@ -7,6 +7,9 @@ questions.json
 # 本地计划文档
 plan.md
 
+# 文档目录
+docs/
+
 # 依赖目录
 node_modules/
 dist/
