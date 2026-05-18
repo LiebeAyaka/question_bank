@@ -1,4 +1,4 @@
-export type QuestionType = 'single' | 'judge' | 'reading' | 'cloze' | 'task_reading' | 'fill' | 'short_answer' | 'essay';
+export type QuestionType = 'single' | 'judge' | 'reading' | 'cloze' | 'task_reading' | 'fill' | 'short_answer' | 'essay' | 'listening_single' | 'listening_group';
 
 export interface SubQuestion {
   content: string;
@@ -76,10 +76,12 @@ export const TYPE_NAMES: Record<QuestionType, string> = {
   task_reading: '任务型阅读',
   fill: '填空题',
   short_answer: '问答题',
-  essay: '作文题'
+  essay: '作文题',
+  listening_single: '听力单选题',
+  listening_group: '听力理解'
 };
 
-export const VALID_TYPES: QuestionType[] = ['single', 'judge', 'reading', 'cloze', 'task_reading', 'fill', 'short_answer', 'essay'];
+export const VALID_TYPES: QuestionType[] = ['single', 'judge', 'reading', 'cloze', 'task_reading', 'fill', 'short_answer', 'essay', 'listening_single', 'listening_group'];
 
 export const DIFFICULTY_NAMES: Record<string, string> = {
   easy: '简单',

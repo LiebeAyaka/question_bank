@@ -60,7 +60,7 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
       type,
       options: type === 'single' ? ['', '', '', ''] : prev.options,
       blanks: type === 'fill' ? [{ content: '', answer: '' }] : prev.blanks,
-      questions: ['reading', 'cloze', 'task_reading'].includes(type) ? [] : prev.questions
+      questions: ['reading', 'cloze', 'task_reading', 'listening_single', 'listening_group'].includes(type) ? [] : prev.questions
     }));
   };
 
@@ -114,6 +114,17 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
   const addSubQuestion = () => {
     const newQuestion: SubQuestion = { content: '', options: ['', '', '', ''], answer: '' };
     setFormData(prev => ({ ...prev, questions: [...(prev.questions || []), newQuestion] }));
+  };
+
+  const handleSubQuestionTypeChange = (index: number, type: 'single' | 'fill') => {
+    const newQuestions = [...(formData.questions || [])];
+    if (type === 'single') {
+      newQuestions[index] = { content: newQuestions[index].content, options: ['A. ', 'B. ', 'C. ', 'D. '], answer: '' };
+    } else {
+      newQuestions[index] = { content: newQuestions[index].content, answer: '' };
+      if (newQuestions[index].options) delete newQuestions[index].options;
+    }
+    setFormData(prev => ({ ...prev, questions: newQuestions }));
   };
 
   const removeSubQuestion = (index: number) => {
@@ -180,7 +191,7 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
       return false;
     }
 
-    if (['reading', 'cloze', 'task_reading'].includes(formData.type)) {
+    if (['reading', 'cloze', 'task_reading', 'listening_single', 'listening_group'].includes(formData.type)) {
       if (!formData.questions || formData.questions.length === 0) {
         showToast('请添加至少一道子问题', 'warning');
         return false;
@@ -190,11 +201,11 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
           showToast(`请填写第${i + 1}道子问题的内容`, 'warning');
           return false;
         }
-        if (formData.type !== 'task_reading' && !formData.questions[i].answer) {
-          showToast(`请为第${i + 1}道子问题选择正确答案`, 'warning');
+        if (!formData.questions[i].answer) {
+          showToast(`请为第${i + 1}道子问题填写答案`, 'warning');
           return false;
         }
-        if (formData.type !== 'task_reading' && formData.sub_type === 'single' && (!formData.questions[i].options || formData.questions[i].options!.length < 2)) {
+        if (formData.questions[i].options && formData.questions[i].options!.length < 2) {
           showToast(`第${i + 1}道子问题至少需要2个选项`, 'warning');
           return false;
         }
@@ -216,7 +227,7 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
       sub_type: ['reading', 'cloze'].includes(formData.type) ? formData.sub_type : undefined,
       options: formData.type === 'single' ? formData.options?.filter(o => o.trim()) : undefined,
       answer: formData.answer || undefined,
-      questions: ['reading', 'cloze', 'task_reading'].includes(formData.type)
+      questions: ['reading', 'cloze', 'task_reading', 'listening_single', 'listening_group'].includes(formData.type)
         ? formData.questions?.filter(q => q.content.trim())
         : undefined,
       blanks: formData.type === 'fill'
@@ -457,6 +468,127 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
     );
   };
 
+  const renderListeningQuestions = () => {
+    if (!['listening_single', 'listening_group'].includes(formData.type)) return null;
+
+    const isGroup = formData.type === 'listening_group';
+
+    return (
+      <div className={styles.subQuestionSection}>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>🎧 听力材料（原文）</label>
+          <textarea
+            className={styles.textarea}
+            placeholder="请输入听力原文材料..."
+            value={formData.content}
+            onChange={(e) => handleContentChange(e.target.value)}
+            style={{ minHeight: '120px' }}
+          />
+        </div>
+
+        <label className={styles.label}>
+          📝 {isGroup ? '子问题列表' : '题目'}
+          {!isGroup && <span style={{ fontWeight: 'normal', marginLeft: '8px', color: '#666' }}>（单选题）</span>}
+        </label>
+        <div className={styles.subQuestionList}>
+          {(formData.questions || []).map((sq, idx) => (
+            <div key={idx} className={styles.subQuestionItem}>
+              <div className={styles.subQuestionHeader}>
+                <span className={styles.subQuestionTitle}>
+                  {isGroup ? `子问题 ${idx + 1}` : '题目'}
+                </span>
+                {isGroup && (
+                  <button type="button" className={styles.removeBtn} onClick={() => removeSubQuestion(idx)}>🗑️</button>
+                )}
+              </div>
+
+              {isGroup && (
+                <div className={styles.subQuestionTypeSelector}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                    <input
+                      type="radio"
+                      checked={!sq.options}
+                      onChange={() => handleSubQuestionTypeChange(idx, 'fill')}
+                    />
+                    填空题
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                    <input
+                      type="radio"
+                      checked={!!sq.options}
+                      onChange={() => handleSubQuestionTypeChange(idx, 'single')}
+                    />
+                    单选题
+                  </label>
+                </div>
+              )}
+
+              <input
+                type="text"
+                className={styles.input}
+                placeholder={sq.options ? "请输入问题内容" : "请输入填空题题目（包含空位标记）"}
+                value={sq.content}
+                onChange={(e) => handleSubQuestionChange(idx, 'content', e.target.value)}
+                style={{ marginBottom: '10px' }}
+              />
+
+              {sq.options && (
+                <div className={styles.subQuestionGrid}>
+                  {[0, 1, 2, 3].map(optIdx => (
+                    <div key={optIdx} style={{ display: 'flex', gap: '5px' }}>
+                      <span className={styles.optionLetter} style={{ width: '24px', height: '24px', fontSize: '12px' }}>{LETTERS[optIdx]}</span>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder={`选项${LETTERS[optIdx]}`}
+                        value={sq.options?.[optIdx] || ''}
+                        onChange={(e) => handleSubQuestionOptionChange(idx, optIdx, e.target.value)}
+                        style={{ fontSize: '14px', padding: '8px' }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className={styles.answerBtns} style={{ marginTop: '10px' }}>
+                {sq.options
+                  ? sq.options.filter(o => o?.trim()).map((opt, optIdx) => (
+                    <button
+                      key={optIdx}
+                      type="button"
+                      className={`${styles.answerBtn} ${sq.answer === opt ? styles.selected : ''}`}
+                      onClick={() => handleSubQuestionChange(idx, 'answer', opt)}
+                    >
+                      {LETTERS[optIdx]}
+                    </button>
+                  ))
+                  : (
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <span style={{ fontSize: '13px', color: '#666' }}>答案：</span>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder="请输入答案"
+                        value={sq.answer}
+                        onChange={(e) => handleSubQuestionChange(idx, 'answer', e.target.value)}
+                        style={{ flex: 1, minWidth: '150px' }}
+                      />
+                    </div>
+                  )
+                }
+              </div>
+            </div>
+          ))}
+          {isGroup && (
+            <button type="button" className={styles.addOptionBtn} onClick={addSubQuestion}>
+              ➕ 添加子问题
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Modal title={isEditing ? '编辑题目' : '添加题目'} onClose={onClose}>
       <form className={styles.form} onSubmit={handleSubmit}>
@@ -561,6 +693,8 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
         )}
 
         {['short_answer', 'essay'].includes(formData.type) && renderShortAnswerOrEssay()}
+
+        {['listening_single', 'listening_group'].includes(formData.type) && renderListeningQuestions()}
 
         <div className={styles.formGroup}>
           <label className={styles.label}>难度</label>

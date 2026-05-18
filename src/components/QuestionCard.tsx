@@ -20,7 +20,8 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
     return question.questions.map((sq, idx) => (
       <div key={idx} className={styles.subQuestionItem}>
         <div className={styles.questionText}>
-          {idx + 1}{showContent ? `. ${unescapeHtml(sq.content)}` : ''}
+          {idx + 1}. {showContent ? unescapeHtml(sq.content) : ''}
+          {!sq.options && <span className={styles.fillAnswer}>（答案：{unescapeHtml(sq.answer)}）</span>}
         </div>
         {sq.options && sq.options.length > 0 && (
           <div className={styles.options}>
@@ -30,6 +31,12 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
                 <span>{unescapeHtml(opt)}</span>
               </div>
             ))}
+          </div>
+        )}
+        {sq.options && sq.options.length > 0 && (
+          <div className={styles.answerDisplay}>
+            <span className={styles.answerLabel}>答案：</span>
+            {LETTERS[sq.options.findIndex(o => o === sq.answer)] || sq.answer}
           </div>
         )}
         {question.sub_type === 'judge' && (
@@ -242,6 +249,41 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
         <>
           <div className={styles.content}>{unescapeHtml(question.content)}</div>
           {renderJudgeOptions()}
+        </>
+      )}
+
+      {(question.type === 'listening_single' || question.type === 'listening_group') && (
+        <>
+          <div className={styles.listeningMaterial}>
+            <div className={styles.listeningLabel}>🎧 听力材料</div>
+            <div className={styles.listeningContent}>{unescapeHtml(question.content)}</div>
+          </div>
+          <div className={styles.subQuestionLabel}>
+            {question.type === 'listening_single' 
+              ? '题目' 
+              : `共 ${question.questions?.length || 0} 道子题`}
+          </div>
+          {question.questions && question.questions.length > 0 && (
+            <button
+              type="button"
+              className={styles.expandBtn}
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? '▲ 收起' : '▼ 展开'}
+            </button>
+          )}
+          {isExpanded && (
+            <>
+              {renderSubQuestions()}
+              <button
+                type="button"
+                className={styles.expandBtn}
+                onClick={() => setIsExpanded(false)}
+              >
+                ▲ 收起
+              </button>
+            </>
+          )}
         </>
       )}
 
