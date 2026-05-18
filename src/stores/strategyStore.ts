@@ -13,7 +13,7 @@ interface StrategyState {
   deleteStrategy: (id: string) => Promise<boolean>;
 }
 
-export const useStrategyStore = create<StrategyState>((set, get) => ({
+export const useStrategyStore = create<StrategyState>((set) => ({
   strategies: [],
   loading: false,
   error: null,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useStrategyStore } from '@/stores/strategyStore';
 import { StrategyForm } from './StrategyForm';
 import { useToast } from './common/Toast';
