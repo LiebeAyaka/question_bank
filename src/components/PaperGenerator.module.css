@@ -1,0 +1,395 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-weight: 600;
+  color: #333;
+}
+
+.input {
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.3s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.sectionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.sectionItem {
+  border: 2px solid #667eea;
+  border-radius: 10px;
+  padding: 15px;
+  background: #f8f9ff;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.sectionTitle {
+  font-weight: bold;
+  color: #667eea;
+}
+
+.sectionGrid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: end;
+}
+
+.sectionField {
+  flex: 1;
+  min-width: 120px;
+}
+
+.sectionFieldLabel {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.sectionSelect {
+  width: 100%;
+  padding: 10px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+}
+
+.sectionSelect:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.sectionCount {
+  width: 80px;
+  padding: 10px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.removeBtn {
+  padding: 5px 10px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.addSectionBtn {
+  padding: 10px 20px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.generateBtn {
+  padding: 15px 30px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  align-self: center;
+}
+
+.generateBtn:hover {
+  background: #5a6fd6;
+}
+
+.checkboxGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.preview {
+  margin-top: 30px;
+  padding: 20px;
+  background: #f8f9ff;
+  border-radius: 10px;
+}
+
+.previewTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.previewInfo {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.previewSections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.previewSection {
+  border-left: 4px solid #667eea;
+  padding-left: 15px;
+}
+
+.sectionName {
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 15px;
+}
+
+.questionItem {
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+
+.questionContent {
+  margin-bottom: 5px;
+}
+
+.subQuestions {
+  margin-top: 10px;
+  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subQuestion {
+  padding: 8px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.optionItem {
+  margin-left: 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+.blankItem {
+  margin-left: 40px;
+  color: #666;
+  font-size: 14px;
+}
+
+.answerItem {
+  margin-left: 20px;
+  color: #28a745;
+  font-size: 14px;
+}
+
+.exportArea {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.exportInputGroup {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.exportInput {
+  padding: 10px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.radioGroup {
+  display: flex;
+  gap: 15px;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.exportBtn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.exportBtnPrimary {
+  background: #28a745;
+  color: white;
+}
+
+.exportBtnSecondary {
+  background: #667eea;
+  color: white;
+}
+
+.hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 20px 0;
+}
+
+.strategyRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.strategyRow .input {
+  flex: 1;
+}
+
+.manageStrategyBtn {
+  padding: 12px 20px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.manageStrategyBtn:hover {
+  background: #5a6fd6;
+}
+
+.strategyListPanel {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f8f9ff;
+  border: 2px solid #667eea;
+  border-radius: 10px;
+}
+
+.strategyListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+.newStrategyBtn {
+  padding: 8px 16px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.newStrategyBtn:hover {
+  background: #218838;
+}
+
+.emptyStrategies {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+}
+
+.strategyList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.strategyCard {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.strategyCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.strategyName {
+  font-weight: 600;
+  color: #333;
+}
+
+.strategyActions {
+  display: flex;
+  gap: 8px;
+}
+
+.editBtn, .deleteBtn {
+  padding: 4px 12px;
+  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editBtn {
+  background: #007bff;
+  color: white;
+}
+
+.deleteBtn {
+  background: #dc3545;
+  color: white;
+}
+
+.strategyInfo {
+  font-size: 13px;
+  color: #666;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

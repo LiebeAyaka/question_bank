@@ -1,0 +1,120 @@
+from pydantic import BaseModel
+from typing import Optional, List
+import json
+
+
+class QuestionBase(BaseModel):
+    id: str
+    type: str
+    content: str
+    title: Optional[str] = None
+    sub_type: Optional[str] = None
+    options: Optional[List[str]] = None
+    answer: Optional[str] = None
+    questions: Optional[List[dict]] = None
+    blanks: Optional[List[dict]] = None
+    exam_points: Optional[List[str]] = None
+    difficulty: Optional[str] = None
+    unit: Optional[str] = None
+    created_at: str
+
+
+class QuestionCreate(BaseModel):
+    type: str
+    content: str
+    title: Optional[str] = None
+    sub_type: Optional[str] = None
+    options: Optional[List[str]] = None
+    answer: Optional[str] = None
+    questions: Optional[List[dict]] = None
+    blanks: Optional[List[dict]] = None
+    exam_points: Optional[List[str]] = None
+    difficulty: Optional[str] = None
+    unit: Optional[str] = None
+
+
+class QuestionUpdate(BaseModel):
+    type: Optional[str] = None
+    content: Optional[str] = None
+    title: Optional[str] = None
+    sub_type: Optional[str] = None
+    options: Optional[List[str]] = None
+    answer: Optional[str] = None
+    questions: Optional[List[dict]] = None
+    blanks: Optional[List[dict]] = None
+    exam_points: Optional[List[str]] = None
+    difficulty: Optional[str] = None
+    unit: Optional[str] = None
+
+
+def safe_json_loads(value):
+    if not value:
+        return None
+    try:
+        return json.loads(value)
+    except (json.JSONDecodeError, TypeError):
+        return None
+
+
+def question_from_row(row: dict) -> dict:
+    question = QuestionBase(
+        id=row['id'],
+        type=row['type'],
+        content=row['content'],
+        title=row.get('title'),
+        sub_type=row.get('sub_type'),
+        options=safe_json_loads(row.get('options')),
+        answer=row.get('answer'),
+        questions=safe_json_loads(row.get('questions')),
+        blanks=safe_json_loads(row.get('blanks')),
+        exam_points=safe_json_loads(row.get('exam_points')),
+        difficulty=row.get('difficulty'),
+        unit=row.get('unit'),
+        created_at=row['created_at']
+    )
+    result = question.model_dump()
+    
+    if result.get('questions'):
+        for sq in result['questions']:
+            sq.setdefault('content', '')
+            sq.setdefault('options', None)
+            sq.setdefault('answer', '')
+    if result.get('blanks'):
+        for b in result['blanks']:
+            b.setdefault('answer', '')
+    
+    return result
+
+
+def question_create_to_row(question: QuestionCreate) -> dict:
+    return {
+        'type': question.type,
+        'content': question.content,
+        'title': question.title,
+        'sub_type': question.sub_type,
+        'options': json.dumps(question.options) if question.options is not None else None,
+        'answer': question.answer,
+        'questions': json.dumps(question.questions) if question.questions is not None else None,
+        'blanks': json.dumps(question.blanks) if question.blanks is not None else None,
+        'exam_points': json.dumps(question.exam_points) if question.exam_points is not None else None,
+        'difficulty': question.difficulty,
+        'unit': question.unit,
+    }
+
+
+def question_to_row(question) -> dict:
+    return {
+        'id': getattr(question, 'id', None),
+        'type': question.type,
+        'content': question.content,
+        'title': getattr(question, 'title', None),
+        'sub_type': getattr(question, 'sub_type', None),
+        'options': json.dumps(question.options) if getattr(question, 'options', None) is not None else None,
+        'answer': getattr(question, 'answer', None),
+        'questions': json.dumps(question.questions) if getattr(question, 'questions', None) is not None else None,
+        'blanks': json.dumps(question.blanks) if getattr(question, 'blanks', None) is not None else None,
+        'exam_points': json.dumps(question.exam_points) if getattr(question, 'exam_points', None) is not None else None,
+        'difficulty': getattr(question, 'difficulty', None),
+        'unit': getattr(question, 'unit', None),
+        'created_at': getattr(question, 'created_at', None)
+    }

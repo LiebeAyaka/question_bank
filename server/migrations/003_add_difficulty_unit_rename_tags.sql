@@ -1,0 +1,3 @@
+-- v3: 添加 difficulty、unit 列，并将 tags 列重命名为 exam_points
+-- 此迁移的实际逻辑由 Python 代码处理（migrations.py:_apply_migration_003）
+-- SQL 文件仅作为版本标记，确保迁移顺序正确

@@ -1,0 +1,157 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-weight: 600;
+  color: #333;
+}
+
+.input {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.presetButtons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.presetBtn {
+  padding: 8px 12px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.presetBtn:hover {
+  background: #e0e0e0;
+}
+
+.presetRatio {
+  font-size: 12px;
+  color: #666;
+}
+
+.ratioInputs {
+  display: flex;
+  gap: 16px;
+}
+
+.ratioInput {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ratioInput label {
+  min-width: 40px;
+}
+
+.ratioInput input {
+  width: 70px;
+  padding: 8px;
+  text-align: center;
+}
+
+.ratioSum {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.ratioSum .error {
+  color: #dc3545;
+}
+
+.unitList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.unitItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #f8f8f8;
+  border-radius: 6px;
+}
+
+.removeBtn {
+  padding: 4px 8px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.addUnitRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.addBtn {
+  padding: 10px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.btnRow {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btnPrimary {
+  background: #28a745;
+  color: white;
+}
+
+.btnSecondary {
+  background: #6c757d;
+  color: white;
+}

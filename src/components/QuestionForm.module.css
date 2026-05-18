@@ -1,0 +1,218 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-weight: 600;
+  color: #333;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.3s;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.readingSection {
+  border: 2px solid #667eea;
+  border-radius: 10px;
+  padding: 15px;
+  background: #f8f9ff;
+  margin-top: 15px;
+}
+
+.subQuestionSection {
+  margin-top: 15px;
+}
+
+.subQuestionList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.subQuestionItem {
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  background: #fff;
+}
+
+.subQuestionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.subQuestionTitle {
+  font-weight: bold;
+  color: #667eea;
+}
+
+.subQuestionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.answerBtns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.answerBtn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+  background: #e0e0e0;
+  color: #333;
+}
+
+.answerBtn.selected {
+  background: #667eea;
+  color: white;
+}
+
+.answerBtn.correct {
+  background: #28a745;
+  color: white;
+}
+
+.answerBtn.wrong {
+  background: #dc3545;
+  color: white;
+}
+
+.optionRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.optionLetter {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #667eea;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.optionInput {
+  flex: 1;
+}
+
+.addOptionBtn {
+  padding: 5px 10px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.removeBtn {
+  padding: 5px 10px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btnRow {
+  display: flex;
+  gap: 15px;
+}
+
+.btnSuccess {
+  background: #28a745;
+  color: white;
+}
+
+.btnSecondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btnFullWidth {
+  width: 100%;
+}
+
+.blanksList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.blankRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.blankNumber {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #667eea;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
+}
+
+.tagInput {
+  display: flex;
+  gap: 10px;
+}
+
+.tagHint {
+  font-size: 12px;
+  color: #999;
+}
