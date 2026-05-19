@@ -155,7 +155,6 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
       {question.type === 'reading' && (
         <>
           <div className={styles.readingBox}>
-            {question.title && <div className={styles.readingTitle}>{unescapeHtml(question.title)}</div>}
             {question.content && (
               <div className={styles.questionText}>
                 {unescapeHtml(question.content)}

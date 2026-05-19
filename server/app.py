@@ -164,7 +164,6 @@ def seed_sample_data():
         {
             'id': str(uuid.uuid4()),
             'type': 'reading',
-            'title': 'Introducción al Español',
             'content': 'El español es uno de los idiomas más hablados del mundo. Pertenece a la familia de lenguas romances y es el idioma oficial de España y la mayoría de los países de América Latina. El español tiene 27 letras en su alfabeto, incluyendo 5 vocales (a, e, i, o, u).',
             'sub_type': 'single',
             'questions': json.dumps([

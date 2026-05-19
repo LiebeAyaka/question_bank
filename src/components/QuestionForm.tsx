@@ -331,7 +331,6 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
     const submitData: QuestionCreate = {
       type: formData.type,
       content: formData.content,
-      title: formData.title || undefined,
       sub_type: ['reading', 'cloze'].includes(formData.type) ? formData.sub_type : undefined,
       options: formData.type === 'single' ? formData.options?.filter(o => o.trim()) : undefined,
       answer: formData.answer || undefined,
@@ -753,19 +752,6 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
             ))}
           </select>
         </div>
-
-        {formData.type === 'reading' && (
-          <div className={styles.formGroup}>
-            <label className={styles.label}>阅读材料标题（可选）</label>
-            <input
-              type="text"
-              className={styles.input}
-              placeholder="请输入标题"
-              value={formData.title || ''}
-              onChange={(e) => handleTitleChange(e.target.value)}
-            />
-          </div>
-        )}
 
         {(formData.type === 'reading' || formData.type === 'cloze') && (
           <div className={styles.formGroup}>
