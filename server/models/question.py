@@ -56,11 +56,33 @@ def safe_json_loads(value):
         return None
 
 
-VALID_TYPES = {'single', 'judge', 'reading', 'cloze', 'task_reading', 'fill', 'short_answer', 'essay', 'listening_single', 'listening_group'}
+VALID_TYPES = {'single', 'judge', 'reading', 'cloze', 'fill', 'short_answer', 'essay', 'listening_single', 'listening_group'}
 
 TYPE_ALIASES = {
     'listening': 'listening_group',
+    'task_reading': 'reading',
 }
+
+
+def validate_sub_questions(question: dict) -> tuple[bool, str]:
+    q_type = question.get('type')
+    questions = question.get('questions') or []
+    
+    if q_type == 'listening_single':
+        if len(questions) != 1:
+            return False, "听力单选题只能有1道子题目"
+    
+    if q_type in ('reading', 'listening_group'):
+        if len(questions) < 1:
+            return False, "至少需要1道子题目"
+    
+    for idx, sq in enumerate(questions):
+        if not sq.get('content'):
+            return False, f"第{idx+1}道子题目内容不能为空"
+        if not sq.get('answer'):
+            return False, f"第{idx+1}道子题目答案不能为空"
+    
+    return True, ""
 
 
 def _normalize_items(items, defaults, str_field='content'):

@@ -169,26 +169,6 @@ export function PaperGenerator() {
           }
           sectionIndex++;
           md += `\n`;
-        } else if (q.type === 'task_reading') {
-          md += `${num}. ${q.title ? escapeHtml(q.title) : '任务型阅读'}\n`;
-          if (q.content) {
-            md += `${escapeHtml(q.content)}\n`;
-          }
-          const taskSubCount = q.questions?.length || 0;
-          if (taskSubCount > 0) {
-            q.questions!.forEach((sq, sqIdx) => {
-              const subNum = resetNumber ? sqIdx + 1 : globalIndex + 1 + sqIdx;
-              md += `   ${subNum}. ${escapeHtml(sq.content)}\n`;
-              if (showAnswer) {
-                md += `   **参考答案：${escapeHtml(sq.answer)}**\n`;
-              } else {
-                md += `   ______________________________________\n`;
-              }
-            });
-            globalIndex += taskSubCount;
-          }
-          sectionIndex++;
-          md += `\n`;
         } else if (q.type === 'fill') {
           md += `${num}. ${escapeHtml(q.content)}\n`;
           if (q.blanks) {
@@ -229,7 +209,7 @@ export function PaperGenerator() {
   const getTotalQuestionCount = (): number => {
     let total = 0;
     generatedQuestions.forEach(q => {
-      if (q.type === 'reading' || q.type === 'cloze' || q.type === 'task_reading') {
+      if (q.type === 'reading' || q.type === 'cloze') {
         total += (q.questions?.length || 0);
       } else {
         total += 1;
@@ -278,7 +258,7 @@ export function PaperGenerator() {
                 return (
                   <div key={q.id} className={styles.questionItem}>
                     <div className={styles.questionContent}>
-                      {q.type === 'reading' || q.type === 'task_reading' ? (
+                      {q.type === 'reading' ? (
                         <>
                           {q.title && <strong>{q.title}</strong>}
                           {q.content && <p>{q.content}</p>}

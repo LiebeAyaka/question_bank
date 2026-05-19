@@ -4,7 +4,7 @@ import json
 import logging
 from datetime import datetime, timezone
 from flask import Blueprint, request, jsonify, current_app
-from models.question import QuestionCreate, QuestionUpdate, question_from_row, question_create_to_row
+from models.question import QuestionCreate, QuestionUpdate, question_from_row, question_create_to_row, validate_sub_questions
 
 bp = Blueprint('questions', __name__, url_prefix='/api/questions')
 
@@ -107,6 +107,10 @@ def create_question():
             unit=data.get('unit')
         )
 
+        valid, msg = validate_sub_questions(question.model_dump())
+        if not valid:
+            return jsonify({'error': msg}), 400
+
         conn = get_db()
         cursor = conn.cursor()
 
@@ -165,6 +169,12 @@ def update_question(question_id):
 
         if not row:
             return jsonify({'error': '题目不存在'}), 404
+
+        # 验证子题目数量
+        if 'questions' in data:
+            valid, msg = validate_sub_questions(data)
+            if not valid:
+                return jsonify({'error': msg}), 400
 
         # 构建更新字段列表
         updates = []

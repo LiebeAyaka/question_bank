@@ -134,7 +134,7 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
               </span>
             );
           })()}
-          {(question.type === 'reading' || question.type === 'cloze' || question.type === 'task_reading') && question.questions && (
+          {(question.type === 'reading' || question.type === 'cloze') && question.questions && (
             <span className={styles.tag}>
               {question.type === 'cloze' ? `${question.questions.length}个空位` : `${question.questions.length}道子题`}
             </span>
@@ -152,7 +152,7 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
           </button>
         </div>
       </div>
-      {(question.type === 'reading' || question.type === 'task_reading') && (
+      {question.type === 'reading' && (
         <>
           <div className={styles.readingBox}>
             {question.title && <div className={styles.readingTitle}>{unescapeHtml(question.title)}</div>}
@@ -161,14 +161,9 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
                 {unescapeHtml(question.content)}
               </div>
             )}
-            {question.type === 'reading' && (
-              <div className={styles.subQuestionLabel}>
-                子问题题型：{question.sub_type === 'single' ? '单选题' : '判断题'}
-              </div>
-            )}
-            {question.type === 'task_reading' && (
-              <div className={styles.subQuestionLabel}>子问题为文本作答</div>
-            )}
+            <div className={styles.subQuestionLabel}>
+              子问题题型：{question.sub_type === 'single' ? '单选题' : question.sub_type === 'judge' ? '判断题' : '文本作答'}
+            </div>
           </div>
           {question.questions && question.questions.length > 0 && (
             <button
@@ -260,7 +255,7 @@ export function QuestionCard({ question, onEdit, onDelete }: QuestionCardProps) 
           </div>
           <div className={styles.subQuestionLabel}>
             {question.type === 'listening_single' 
-              ? '题目' 
+              ? `题目（${question.questions?.[0]?.options ? '单选题' : '填空题'}）` 
               : `共 ${question.questions?.length || 0} 道子题`}
           </div>
           {question.questions && question.questions.length > 0 && (

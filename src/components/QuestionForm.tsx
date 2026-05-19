@@ -102,7 +102,10 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
       type,
       options: type === 'single' ? ['', '', '', ''] : prev.options,
       blanks: type === 'fill' ? [{ content: '', answer: '' }] : prev.blanks,
-      questions: ['reading', 'cloze', 'task_reading', 'listening_single', 'listening_group'].includes(type) ? [] : prev.questions
+      questions: type === 'listening_single' 
+        ? [{ content: '', options: ['', '', '', ''], answer: '' }] 
+        : ['reading', 'cloze', 'listening_group'].includes(type) ? [] 
+        : prev.questions
     }));
   };
 
@@ -291,7 +294,7 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
       return false;
     }
 
-    if (['reading', 'cloze', 'task_reading', 'listening_single', 'listening_group'].includes(formData.type)) {
+    if (['reading', 'cloze', 'listening_single', 'listening_group'].includes(formData.type)) {
       if (!formData.questions || formData.questions.length === 0) {
         showToast('请添加至少一道子问题', 'warning');
         return false;
@@ -312,6 +315,11 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
       }
     }
 
+    if (formData.type === 'listening_single' && formData.questions && formData.questions.length !== 1) {
+      showToast('听力单选题只能有1道子题目', 'warning');
+      return false;
+    }
+
     return true;
   };
 
@@ -327,7 +335,7 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
       sub_type: ['reading', 'cloze'].includes(formData.type) ? formData.sub_type : undefined,
       options: formData.type === 'single' ? formData.options?.filter(o => o.trim()) : undefined,
       answer: formData.answer || undefined,
-      questions: ['reading', 'cloze', 'task_reading', 'listening_single', 'listening_group'].includes(formData.type)
+      questions: ['reading', 'cloze', 'listening_single', 'listening_group'].includes(formData.type)
         ? formData.questions?.filter(q => q.content.trim())
         : undefined,
       blanks: formData.type === 'fill'
@@ -423,11 +431,44 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
   };
 
   const renderSubQuestions = () => {
-    if (!['reading', 'cloze', 'task_reading'].includes(formData.type)) return null;
+    if (!['reading', 'cloze'].includes(formData.type)) return null;
+
+    const isReading = formData.type === 'reading';
 
     return (
       <div className={styles.subQuestionSection}>
-        <label className={styles.label}>📝 子问题列表</label>
+        {isReading && (
+          <div className={styles.formGroup}>
+            <label className={styles.label}>子问题类型</label>
+            <div style={{ display: 'flex', gap: '20px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  checked={formData.sub_type === 'single'}
+                  onChange={() => setFormData(prev => ({ ...prev, sub_type: 'single' }))}
+                />
+                单选题
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  checked={formData.sub_type === 'judge'}
+                  onChange={() => setFormData(prev => ({ ...prev, sub_type: 'judge' }))}
+                />
+                判断题
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  checked={!formData.sub_type || formData.sub_type === 'text'}
+                  onChange={() => setFormData(prev => ({ ...prev, sub_type: 'text' as any }))}
+                />
+                文本作答
+              </label>
+            </div>
+          </div>
+        )}
+        <label className={styles.label}>📝 {formData.type === 'cloze' ? '空位列表' : '子问题列表'}</label>
         <div className={styles.subQuestionList}>
           {(formData.questions || []).map((sq, idx) => (
             <div key={idx} className={styles.subQuestionItem}>
@@ -438,7 +479,7 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
                 <button type="button" className={styles.removeBtn} onClick={() => removeSubQuestion(idx)}>🗑️</button>
               </div>
 
-              {formData.type !== 'task_reading' && formData.type !== 'cloze' && (
+              {!isReading && formData.type !== 'cloze' && (
                 <>
                   <input
                     type="text"
@@ -450,7 +491,8 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
                   />
                 </>
               )}
-              {formData.sub_type === 'single' && (
+
+              {isReading && formData.sub_type === 'single' && (
                 <div className={styles.subQuestionGrid}>
                   {[0, 1, 2, 3].map(optIdx => (
                     <div key={optIdx} style={{ display: 'flex', gap: '5px' }}>
@@ -467,9 +509,10 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
                   ))}
                 </div>
               )}
-              <div className={styles.answerBtns} style={{ marginTop: '10px' }}>
-                {formData.sub_type === 'single'
-                  ? sq.options?.filter(o => o?.trim()).map((opt, optIdx) => (
+
+              {isReading && formData.sub_type === 'single' && (
+                <div className={styles.answerBtns} style={{ marginTop: '10px' }}>
+                  {sq.options?.filter(o => o?.trim()).map((opt, optIdx) => (
                     <button
                       key={optIdx}
                       type="button"
@@ -478,8 +521,13 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
                     >
                       {LETTERS[optIdx]}
                     </button>
-                  ))
-                  : ['T', 'V', 'F'].map(v => (
+                  ))}
+                </div>
+              )}
+
+              {isReading && formData.sub_type === 'judge' && (
+                <div className={styles.answerBtns} style={{ marginTop: '10px' }}>
+                  {['T', 'V', 'F'].map(v => (
                     <button
                       key={v}
                       type="button"
@@ -488,11 +536,11 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
                     >
                       {v === 'T' ? '✓ 正确 (T)' : v === 'V' ? '✓ 正确 (V)' : '✗ 错误'}
                     </button>
-                  ))
-                }
-              </div>
+                  ))}
+                </div>
+              )}
 
-              {formData.type === 'task_reading' && (
+              {isReading && (!formData.sub_type || formData.sub_type === 'text') && (
                 <>
                   <input
                     type="text"
@@ -588,7 +636,7 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
 
         <label className={styles.label}>
           📝 {isGroup ? '子问题列表' : '题目'}
-          {!isGroup && <span style={{ fontWeight: 'normal', marginLeft: '8px', color: '#666' }}>（单选题）</span>}
+          {!isGroup && <span style={{ fontWeight: 'normal', marginLeft: '8px', color: '#666' }}>（{formData.questions?.[0]?.options ? '单选题' : '填空题'}）</span>}
         </label>
         <div className={styles.subQuestionList}>
           {(formData.questions || []).map((sq, idx) => (
@@ -602,7 +650,7 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
                 )}
               </div>
 
-              {isGroup && (
+              {(isGroup || formData.type === 'listening_single') && (
                 <div className={styles.subQuestionTypeSelector}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
                     <input
@@ -679,7 +727,7 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
               </div>
             </div>
           ))}
-          {isGroup && (
+          {isGroup && formData.type !== 'listening_single' && (
             <button type="button" className={styles.addOptionBtn} onClick={addSubQuestion}>
               ➕ 添加子问题
             </button>
@@ -706,7 +754,7 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
           </select>
         </div>
 
-        {(formData.type === 'reading' || formData.type === 'task_reading') && (
+        {formData.type === 'reading' && (
           <div className={styles.formGroup}>
             <label className={styles.label}>阅读材料标题（可选）</label>
             <input
@@ -719,7 +767,7 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
           </div>
         )}
 
-        {(formData.type === 'reading' || formData.type === 'cloze' || formData.type === 'task_reading') && (
+        {(formData.type === 'reading' || formData.type === 'cloze') && (
           <div className={styles.formGroup}>
             <label className={styles.label}>
               {formData.type === 'cloze' ? '文章内容（用___1___、___2___等标记空位）' : '阅读材料内容'}
@@ -763,7 +811,7 @@ export function QuestionForm({ question, onSubmit, onClose }: QuestionFormProps)
         {formData.type === 'single' && renderSingleOptions()}
         {formData.type === 'judge' && renderJudgeAnswer()}
 
-        {['reading', 'cloze', 'task_reading'].includes(formData.type) && renderSubQuestions()}
+        {['reading', 'cloze'].includes(formData.type) && renderSubQuestions()}
 
         {formData.type === 'fill' && (
           <>
